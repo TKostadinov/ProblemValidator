@@ -26,7 +26,7 @@ import javax.swing.JTextPane;
 public class MainScreen {
 
 	private static final String OUTPUT_TEXT_FILE = "output.txt";
-	private static final String TESTS_DIR = "src\\tests\\";
+	private static final String TESTS_DIR = "tests\\";
 	JTextPane edtJava;
 	ArrayList<JRadioButton> radioButtons;
 	JFrame guiFrame;
