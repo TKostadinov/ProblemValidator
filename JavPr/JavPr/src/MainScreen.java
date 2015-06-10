@@ -17,6 +17,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -76,6 +77,7 @@ public class MainScreen {
 		});
 		controlPanel.add(btnRun);
 
+		//Set radio button for each test
 		testFolders = getTestFolders();
 
 		if (testFolders.size() > 0) {
@@ -147,27 +149,25 @@ public class MainScreen {
 		boolean[] results;
 
 		if (javaCode != null && !javaCode.equals("")) {
-			String className = makeClassFile(javaCode);
-			makeJavaFile(className);
+			String className = makeJavaFile(javaCode);
+			boolean noErrors = makeClassFile(className);
 
-			for (int i = 0; i < radioButtons.size(); i++) {
-				JRadioButton rad = radioButtons.get(i);
-				if (rad.isSelected()) {
-					results = runProbOneTests(className, testFolders.get(i));
-					drawResults(results);
+			if(noErrors) {
+				for (int i = 0; i < radioButtons.size(); i++) {
+					JRadioButton rad = radioButtons.get(i);
+					if (rad.isSelected()) {
+						results = runTestsForThisProblem(className, testFolders.get(i));
+						drawResults(results);
+					}
 				}
+			} else {
+				JOptionPane.showMessageDialog(testsContainer, "Could find Java. Check system variables.", "Error", JOptionPane.ERROR_MESSAGE);
 			}
-			// if (zad1.isSelected()) {
-			// results = runProbOneTests(className);
-			// drawResults(results);
-			// } else {
-			// runProbTwoTests();
-			// }
 		}
 
 	}
 
-	private void makeJavaFile(String className) {
+	private boolean makeClassFile(String className) {
 		try {
 			String command = "cmd /c javac " + className;
 			System.out.println(command);
@@ -184,14 +184,15 @@ public class MainScreen {
 		} catch (InterruptedException e2) {
 			e2.printStackTrace();
 		}
+		
+		File f = new File(className.substring(0, className.indexOf(".java")) + ".class");
+		if(f.exists() && !f.isDirectory()) {
+			return true;
+		}
+		return false;
 	}
 
-	private void runProbTwoTests() {
-		// TODO Auto-generated method stub
-
-	}
-
-	private boolean[] runProbOneTests(String className, String problemName) {
+	private boolean[] runTestsForThisProblem(String className, String problemName) {
 		String testDir = problemName;
 		System.out.println("TESTDIR:" + testDir);
 		ArrayList<String> tests = getTestsArray(testDir);
@@ -304,7 +305,7 @@ public class MainScreen {
 		file.delete();
 	}
 
-	private String makeClassFile(String code) {
+	private String makeJavaFile(String code) {
 		String name = null;
 		try {
 			name = getClassName(code) + ".java";
